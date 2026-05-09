@@ -1,0 +1,165 @@
+/* RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+}
+
+.body-principal{
+  background: #f5f7fb;
+  font-family: 'Inter', sans-serif;
+}
+
+/* CONTENEDOR */
+.landing {
+  width: 100%;
+}
+
+/* NAVBAR */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 30px;
+  background: white;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+  color: #2563eb;
+}
+
+.navbar ul {
+  display: flex;
+  gap: 20px;
+  list-style: none;
+}
+
+.navbar a {
+  text-decoration: none;
+  color: #475569;
+  font-weight: 500;
+}
+
+.btn-nav {
+  background: #2563eb;
+  color: white !important;
+  padding: 8px 15px;
+  border-radius: 8px;
+}
+.btn-final{
+ padding: 12px 25px;
+  background: #2563eb;
+  color: white;
+  border-radius: 10px;
+  margin-top: 100px;
+  text-decoration: none;
+}
+
+/* HERO */
+.hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 80px 60px;
+  gap: 30px;
+  font-size: 15px;
+}
+
+.hero-text h2 {
+  font-size: 30px;
+  margin-bottom: 20px;
+}
+
+.hero-text span {
+  color: #2563eb;
+}
+
+.hero-text p {
+  color: #64748b;
+  line-height: 1.6;
+}
+
+.hero-buttons {
+  display: flex;
+  gap: 15px;
+}
+
+.btn-principal {
+  padding: 12px 25px;
+  background: #2563eb;
+  color: white;
+  border-radius: 10px;
+  margin-top: 30px;
+  text-decoration: none;
+}
+
+.btn-secundario {
+  padding: 12px 25px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  text-decoration: none;
+  margin-top: 30px;
+  color: #333;
+}
+
+/* HERO IMAGE */
+.hero-img img {
+  width: 100%;
+  max-width: 900px;
+}
+
+/* FEATURES */
+.features {
+  background: white;
+  padding: 80px 60px;
+  text-align: center;
+}
+
+.features h2 {
+  margin-bottom: 40px;
+}
+
+.cards {
+  display: flex;
+  gap: 30px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.card {
+  background: #f8fafc;
+  padding: 30px;
+  border-radius: 15px;
+  width: 280px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  transition: 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+/* CTA */
+.cta {
+  text-align: center;
+  padding: 80px 20px;
+}
+
+/* FOOTER */
+.footer {
+  background: #0f172a;
+  color: white;
+  text-align: center;
+  padding: 20px;
+}
+
+
+.logo12-img img{
+  height:130px;   /* 👈 más pequeño tipo título */
+  width:auto;
+  object-fit:contain;
+}

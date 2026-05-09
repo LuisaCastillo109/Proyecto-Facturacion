@@ -1,0 +1,114 @@
+.perfil-container {
+  width: 100%;
+  padding: 40px;
+  display: flex;
+  justify-content: center;
+}
+
+.perfil-card {
+  width: 900px; /* 🔥 más ancho */
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+/* TÍTULO */
+.perfil-card h2 {
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 28px;
+  color: #1e293b;
+}
+
+/* CONTENIDO EN DOS COLUMNAS */
+.perfil-content {
+  display: grid;
+  grid-template-columns: 300px 1fr; /* 👈 izquierda foto, derecha form */
+  gap: 40px;
+}
+
+/* FOTO */
+.perfil-foto {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.perfil-foto img {
+  width: 180px; /* 🔥 más grande */
+  height: 180px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 5px solid #3b82f6;
+  margin-bottom: 15px;
+}
+
+.perfil-foto input {
+  margin-bottom: 10px;
+}
+
+.btn-foto {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.btn-foto:hover {
+  background: #2563eb;
+}
+
+/* FORM */
+.perfil-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* 👈 dos columnas */
+  gap: 20px;
+}
+
+.perfil-form label {
+  font-weight: bold;
+  color: #334155;
+  font-size: 14px;
+}
+
+.perfil-form input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  transition: 0.2s;
+  font-size: 14px;
+}
+
+.perfil-form input:focus {
+  border-color: #3b82f6;
+  outline: none;
+}
+
+.perfil-form input:disabled {
+  background: #f1f5f9;
+  color: #777;
+}
+
+/* BOTÓN GRANDE */
+.btn-guardar {
+  grid-column: span 2; /* 👈 ocupa todo el ancho */
+  margin-top: 10px;
+  padding: 12px;
+  background: #16a34a;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.btn-guardar:hover {
+  background: #15803d;
+}

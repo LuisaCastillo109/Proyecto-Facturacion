@@ -1,0 +1,248 @@
+
+
+:root {
+  --primary: #4d77d3; 
+  --primary-hover: #4d77d3;
+  --bg-body: #f8fafc;
+  --bg-card: #ffffff;
+  --text-main: #1e293b;
+  --text-muted: #64748b;
+  --success: #22c55e;
+  --danger: #ef4444;
+  --border: #e2e8f0;
+  --radius: 12px;
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.navbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:15px 40px;
+}
+
+body {
+background: transparent;
+font-family:Arial, Helvetica, sans-serif;
+font-size: 15px;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+/* --- HEADER --- */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.titulo {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-right: 90px;
+  letter-spacing: -0.025em;
+}
+
+.badge {
+  background: var(--primary);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-right: 15px;
+}
+
+.search {
+  padding: 10px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  outline: none;
+  width: 250px;
+  transition: all 0.3s;
+  box-shadow: var(--shadow);
+}
+
+.search:focus {
+  border-color: var(--primary);
+  ring: 2px solid var(--primary);
+}
+
+/* --- FORM BOX --- */
+.form-box {
+  background: var(--bg-card);
+  padding: 25px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin-bottom: 40px;
+  border: 1px solid var(--border);
+}
+
+.form-box h3 {
+  grid-column: 1 / -1;
+  margin-top: 0;
+  font-size: 1.2rem;
+  color: var(--text-muted);
+}
+
+.form-box input, 
+.form-box select, 
+.form-box textarea {
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: 0.3s;
+}
+
+.form-box textarea {
+  grid-column: span 2;
+  resize: vertical;
+}
+
+.form-box input:focus {
+  border-color: var(--primary);
+  outline: none;
+}
+
+/* --- PREVIEW IMAGEN --- */
+.preview {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: center;
+  padding: 10px;
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+}
+
+.preview img {
+  height: 100px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+/* --- TABLA --- */
+.tabla {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+
+.tabla thead {
+  background-color: #f1f5f9;
+}
+
+.tabla th {
+  padding: 16px;
+  text-align: left;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.tabla td {
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.img-producto {
+  width: 50px;
+  height: 50px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1px solid var(--border);
+}
+
+/* --- ESTADOS (BADGES EN TABLA) --- */
+.estado-activo {
+  background: #dcfce7;
+  color: #166534;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.estado-inactivo {
+  background: #fee2e2;
+  color: #991b1b;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+/* --- BOTONES --- */
+.btn {
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+  font-size: 0.9rem;
+}
+
+.btn-crear {
+  background-color: var(--primary);
+  color: white;
+  grid-column: auto;
+}
+
+.btn-crear:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-1px);
+}
+
+.btn-editar {
+  background: transparent;
+  color: var(--primary);
+  border: 1px solid var(--primary);
+  margin-right: 8px;
+}
+
+.btn-editar:hover {
+  background: var(--primary);
+  color: white;
+}
+
+.btn-eliminar {
+  background: transparent;
+  color: var(--danger);
+  border: 1px solid var(--danger);
+}
+
+.btn-eliminar:hover {
+  background: var(--danger);
+  color: white;
+}
+
+.btn-cancelar {
+  background: #e2e8f0;
+  color: #475569;
+}
+
+/* Animación de entrada */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+

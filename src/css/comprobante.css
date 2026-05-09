@@ -1,0 +1,143 @@
+.comprobante-container {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  background-color: #525659; /* Fondo tipo visor PDF */
+  display: flex;
+  justify-content: center;
+}
+
+.factura-paper {
+  background: white;
+  width: 210mm; /* Ancho A4 */
+  min-height: 297mm;
+  padding: 15mm;
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+
+/* Header */
+.header-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  align-items: center;
+  border-bottom: 2px solid #000;
+  padding-bottom: 10px;
+}
+
+.logo-siigo { width: 150px; }
+
+.empresa-details { text-align: center; }
+.empresa-details h1 { font-size: 18px; margin: 0; }
+.empresa-details p { font-size: 11px; margin: 2px; }
+.nit { font-weight: bold; }
+
+/* Info Cliente Bloque */
+.factura-titulo-box {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  border: 1px solid #ccc;
+  margin-top: 10px;
+}
+
+.titulo-izq { border-right: 1px solid #ccc; }
+
+.row-grid {
+  display: grid;
+  grid-template-columns: 80px 1fr 80px 1fr;
+  font-size: 11px;
+}
+
+.label {
+  background: #f2f2f2;
+  padding: 5px;
+  border: 0.5px solid #ccc;
+  font-weight: bold;
+}
+
+.value {
+  padding: 5px;
+  border: 0.5px solid #ccc;
+}
+
+.titulo-der {
+  text-align: center;
+  padding: 5px;
+}
+
+.titulo-der h4 { margin: 0; font-size: 14px; }
+.fechas { font-size: 10px; margin-top: 5px; }
+
+/* Tabla */
+.tabla-siigo {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+  font-size: 11px;
+}
+
+.tabla-siigo th {
+  background: #f2f2f2;
+  border: 1px solid #ccc;
+  padding: 8px;
+}
+
+.tabla-siigo td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: center;
+}
+
+/* Footer Totales */
+.footer-factura {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  margin-top: 20px;
+}
+
+.letras-y-pagos { font-size: 11px; }
+
+.totales-box {
+  border: 1px solid #ccc;
+}
+
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px;
+  font-size: 12px;
+  border-bottom: 1px solid #eee;
+}
+
+.total-row.final {
+  background: #f2f2f2;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+/* Quitar botón al imprimir */
+@media print {
+  .no-print { display: none; }
+  .comprobante-container { background: none; padding: 0; }
+  .factura-paper { box-shadow: none; width: 100%; margin: 0; }
+}
+
+@media print {
+  /* Quita los encabezados y pies de página del navegador (URL, fecha, etc) */
+  @page {
+    margin: 0;
+  }
+
+  body {
+    margin: 1cm; /* Margen interno para que el contenido no pegue al borde del papel */
+  }
+
+  /* Ocultar el botón de imprimir y cualquier otro elemento innecesario */
+  .no-print, .navbar, .sidebar {
+    display: none !important;
+  }
+
+  /* Asegura que el fondo blanco se mantenga */
+  .comprobante-container {
+    background: white !important;
+    padding: 0 !important;
+  }
+}

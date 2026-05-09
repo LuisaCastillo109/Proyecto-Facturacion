@@ -1,0 +1,110 @@
+:root {
+    --primary-green: #00a65a;
+    --bg-gray: #f4f7f6;
+    --border-color: #e1e4e8;
+    --text-main: #333;
+    --status-red: #ff4d4d;
+}
+
+.dashboard-container {
+    background-color: var(--bg-gray);
+    min-height: 100vh;
+}
+
+/* Navbar */
+.main-nav {
+    background-color: var(--primary-green);
+    color: white;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-left, .nav-right { display: flex; align-items: center; gap: 20px; }
+.nav-links { list-style: none; display: flex; gap: 15px; }
+.nav-links a { color: white; text-decoration: none; font-weight: 500; font-size: 14px; }
+.logo-admin { height: 30px; }
+
+.user-profile-nav { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+.user-profile-nav img { width: 32px; height: 32px; border-radius: 50%; border: 2px solid white; }
+
+/* Layout */
+.content-layout {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    gap: 20px;
+    padding: 20px;
+}
+
+/* Sidebar Filtros */
+.sidebar-filters {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    height: fit-content;
+    border: 1px solid var(--border-color);
+}
+
+.btn-nueva-factura {
+    width: 100%;
+    background: var(--primary-green);
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.filter-group { margin-bottom: 15px; }
+.filter-group label { display: block; font-size: 12px; color: #666; margin-bottom: 5px; }
+.filter-group input, .filter-group select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+}
+
+.btn-buscar-filter {
+    width: 100%;
+    background: #eee;
+    border: 1px solid #ccc;
+    padding: 8px;
+    cursor: pointer;
+}
+
+/* Tabla */
+.table-section { background: transparent; }
+.table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+.card-table { background: white; border-radius: 8px; border: 1px solid var(--border-color); overflow: hidden; }
+
+table { width: 100%; border-collapse: collapse; }
+th { background: #f9fafb; padding: 12px; text-align: left; font-size: 12px; color: #777; border-bottom: 1px solid var(--border-color); }
+td { padding: 12px; border-bottom: 1px solid #f0f0f0; font-size: 16px; color: var(--text-main); }
+
+.cell-user { display: flex; align-items: center; gap: 8px; }
+.cell-user img { width: 25px; height: 25px; border-radius: 50%; }
+
+.status-badge {
+    padding: 4px 12px;
+    border-radius: 15px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.status-badge.expedida { background: #ffebeb; color: var(--status-red); border: 1px solid #ffdada; }
+
+/* Modal */
+.modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000;
+}
+
+.modal-invoice {
+    background: white; width: 600px; padding: 30px; border-radius: 12px; position: relative;
+}
+
+.close-modal { position: absolute; top: 15px; right: 15px; border: none; background: none; font-size: 24px; cursor: pointer; }
+.invoice-total { text-align: right; margin-top: 20px; color: var(--primary-green); }

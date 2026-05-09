@@ -1,0 +1,179 @@
+.body-ejemplo{
+  margin:0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #4facfe, #00f2fe);
+}
+.titulo-registro{
+font-size: 30px;
+}
+
+.contenedor-registro{
+  display:flex;
+  justify-content:center;
+  align-items:flex-start; /* 👈 clave */
+  margin-top:20px;        /* opcional */
+  height:80vh;
+}
+
+/* CARD */
+.card-registro{
+  background:white;
+  padding:40px;
+  border-radius:15px;
+  width:500px;
+  text-align:center;
+}
+
+/* INPUTS */
+.card-registro input{
+  width:105%;
+  padding:10px;
+  margin:10px 0;
+  border-radius:8px;
+  border:1px solid #ccc;
+  outline:none;
+  transition:0.3s;
+  font-size: 16px;
+}
+
+.card-registro input:focus{
+  border-color:#4facfe;
+}
+
+/* BOTÓN */
+.boton-cuenta{
+  width:105%;
+  padding:12px;
+  background:#4facfe;
+  color:white;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  margin-top:10px;
+  transition:0.3s;
+  font-size: 16px;
+}
+
+.boton-cuenta:hover{
+  background:#007bff;
+}
+
+/* LINK */
+.link{
+  margin-top:10px;
+  background:none;
+  border:none;
+  color:#555;
+  cursor:pointer;
+  font-size: 16px;
+}
+
+/* REDES */
+.redes{
+  margin-top:20px;
+  border-top:1px solid #eee;
+  padding-top:15px;
+  margin-right: 10px;
+}
+
+.redes p{
+  font-size:14px;
+  color:#888;
+}
+
+.iconos{
+  display:flex;
+  justify-content:space-around;
+  margin-top:10px;
+}
+
+.iconos a{
+  text-decoration:none;
+  color:#333;
+  font-size:14px;
+  transition:0.3s;
+}
+
+.iconos a:hover{
+  color:#4facfe;
+}
+
+/* CONTENEDOR ICONOS */
+.iconos a{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  text-decoration:none;
+  color:#333;
+  font-size:15px;
+  transition:0.3s;
+  margin-right: 10px;
+}
+
+/* ICONOS GENERALES */
+.icon{
+margin-right: 10px;
+  font-size:22px;
+  transition:0.3s;
+}
+
+/* FACEBOOK */
+.facebook{
+  color:#1877f2;
+}
+
+/* CORREO */
+.correo{
+  margin-right: 10px;
+  color:#e74c3c;
+}
+
+/* HOVER EFECTO */
+.iconos a:hover{
+  color:#4facfe;
+}
+
+.iconos a:hover .icon{
+  transform:scale(1.2);
+}
+
+.logo-container{
+  text-align: center;
+  margin-top: 60px;   /* 👈 mueve todo hacia abajo */
+  margin-bottom: 20px;
+}
+
+.logo-img{
+  width:100%;
+  height:200px;
+  object-fit:contain;
+  padding: 10px;
+  margin-bottom:1px;
+  
+}
+
+.logo-container h2{
+  margin:0;
+  color:#4facfe;
+  font-weight:bold;
+}
+
+.input-password {
+  position: relative;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.input-password input {
+  width: 100%;
+  padding-right: 40px;
+}
+
+.input-password span {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  font-size: 18px;
+}
