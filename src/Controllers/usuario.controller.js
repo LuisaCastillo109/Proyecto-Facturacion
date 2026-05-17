@@ -1,17 +1,17 @@
 require("dotenv").config();
-const bcrypt = require ("bcryptjs");
+const bcrypt = require ("bcrypt");
 const crypto = require ("crypto");
+const db = require ("../Conexion/conexion")
+const jwt = require ("jsonwebtoken");
 const transporter = require ("../service/configuracion")
-const db = require("../Conexion/conexion")
-const jwt = require ("jsonwebtoken")
 
 exports.CrearUsuario =(req,res)=>{
 const {nombre,apellido,correo,contraseña,rol}=req.body;
-if (!nombre || !apellido ||!correo ||!contraseña){
+if (!nombre || !apellido || !correo || !contraseña){
 return res.status(400).json("Todos los datos deben de estar llenos")
 }
 if (contraseña.length <6){
-return res.status(400).json("La contraseña debe de tener minimo 6 caracteres")
+return res.status(400).json("La contraseña debe de tener mas de 6 caracteres")
 }
 db.query("SELECT * FROM usuarios WHERE correo=?",
 [correo],
@@ -20,16 +20,16 @@ if (err){
 console.log(err)
 return res.status(400).json("Error en el servidor")
 }
-if (result.length > 0){
+if (result.length >0){
 return res.status(400).json("El correo ya existe en el sistema")
 }
 try{
 const hashedPassword = await bcrypt.hash(contraseña,10)
 const Rol = rol || 2
 const estado = "activo"
-db.query("INSERT INTO usuarios (nombre,apellido,correo,contraseña,estado,rol) VALUES(?,?,?,?,?,?)",
-[nombre,apellido,correo,hashedPassword,estado,Rol],
-async(err,result)=>{
+db.query("INSERT INTO usuarios (nombre,apellido,correo,contraseña,rol)VALUES(?,?,?,?,?)",
+[nombre,apellido,correo,hashedPassword,Rol],
+(err,result)=>{
 if (err){
 console.log(err)
 return res.status(400).json("Usuario no registrado")
@@ -41,10 +41,26 @@ console.log("Usuario no registrado")
 }})};
 
 
+exports.CrearCliente =(req,res)=>{
+const {nombre,apellido,direccion,telefono,documento,email,tipo_documento,pdf}=req.body;
+if (!nombre || !apellido || !direccion || !telefono ||!documento ||!email ||!tipo_documento){
+return res.status(400).json("Todos los datos deben de estar completo")
+}
+db.query("INSERT INTO clientes (nombre,apellido,direccion,telefono,documento,email,tipo_documento,pdf) VALUES (?,?,?,?,?,?,?,?)",
+[nombre,apellido,direccion,telefono,documento,email,tipo_documento,pdf],
+(err,result)=>{
+if (err){
+console.log(err)
+return res.status(400).json("Error al crear el cliente")
+}
+res.send(result)
+})};
+
+
 exports.LoginUsuario =(req,res)=>{
 const {correo,contraseña}=req.body;
 if (!correo || !contraseña){
-return res.status(400).json("Todos los datos deben de estar llenos")
+return res.status(400).json("Los datos deben de estar completos")
 }
 db.query("SELECT * FROM usuarios WHERE correo=?",
 [correo],
@@ -56,7 +72,7 @@ return res.status(400).json("Error en el servidor")
 if (result.length ===0){
 return res.status(400).json("El correo no existe en el sistema")
 }
-const usuario = result [0]
+const usuario = result[0];
 if (usuario.estado==="inactivo"){
 return res.status(400).json("Usuario inactivo, contacte al administrador")
 }
@@ -68,8 +84,8 @@ if (!ConfirmarContraseña){
 return res.status(400).json("Contraseña incorrecta")
 }
 const Token = jwt.sign({
-rol : usuario.rol,
-id : usuario.id
+id : usuario.id,
+rol : usuario.rol
 },
 process.env.JWT_SECRET,
 {expiresIn : "1h"}
@@ -77,56 +93,55 @@ process.env.JWT_SECRET,
 res.status(200).json({
 mensaje : "Ingreso Exitoso",
 Token,
-usuario : {
+usuario :{
 id : usuario.id,
 nombre : usuario.nombre,
 apellido : usuario.apellido,
 correo : usuario.correo,
+rol : usuario.rol,
+telefono : usuario.telefono,
 estado : usuario.estado,
-foto : usuario.foto,
-telefono : usuario.telefono
+foto : usuario.foto
 }})})};
 
 
-exports.RecuperarPassword =(req,res)=>{
+exports.RecuperarPassword = (req,res)=>{
 const {correo}=req.body;
 if (!correo){
 return res.status(400).json("El campo es obligatorio")
 }
 db.query("SELECT * FROM usuarios WHERE correo=?",
 [correo],
-(err,result)=>{
+async(err,result)=>{
 if (err){
 console.log(err)
-return res.status("Error en el servidor")
+return res.status(400).json("Error en el servidor")
 }
 if (result.length ===0){
 return res.status(400).json("El correo no existe en el sistema")
 }
-const Token  = crypto.randomBytes(20).toString("hex");
-const expiracion = new Date (Date.now()+15*60*1000);
-db.query("UPDATE usuarios SET reset_token =?, reset_expira=? WHERE correo=?",
+const Token = crypto.randomBytes(20).toString("hex")
+const expiracion = new Date (Date.now()+15*60*1000)
+db.query("UPDATE usuarios SET reset_token=?, reset_expira=? WHERE correo=?",
 [Token,expiracion,correo],
 async(err,result)=>{
 if (err)
 return res.status(400).json("Error al generar el token")
 const Link = `http://localhost:3000/ReestablecerPassword/${Token}`
 await transporter.sendMail({
-from : "Soporte <dkim44243@gmail.com>",
+from :"Soporte <dkim44243@gmail.com>",
 to : correo,
 subject : "Reestablecer Contraseña",
 html : `<h2>Reestablecer Contraseña</h2>
-<p>Haz click en este enlace para reestablecer su contraseña</p>
-<a href ="${Link}">${Link}</a>
+<p>Haz  click en este enlace para reestablecer su contraseña</p>
+<a href = "${Link}">${Link}</a>
 <p>El enlace vence en 15 minutos</p>`
 })
 if (err){
-console.log(err)
-return res.status(400).json("Error al enviar el correo")
+return res.status(400).json("Error al enviar el correo electronico")
 }
 res.status(200).json("Correo enviado exitosamente")
 })})};
-
 
 
 exports.ReestablecerPassword =(req,res)=>{
@@ -134,7 +149,10 @@ const {contraseña,Token}=req.body;
 if (!contraseña){
 return res.status(400).json("El campo es obligatorio")
 }
-db.query("SELECT * FROM usuarios WHERE reset_token =? AND reset_expira >NOW()",
+if (contraseña.length <6){
+return res.status(400).json("La contraseña debe de tener minimo 6 caracteres")
+}
+db.query("SELECT * FROM usuarios WHERE reset_token=? AND reset_expira >NOW()",
 [Token],
 async(err,result)=>{
 if (err){
@@ -146,14 +164,14 @@ return res.status(400).json("Error al ingresar al token")
 }
 try{
 const hashedPassword = await bcrypt.hash(contraseña,10)
-db.query("UPDATE usuarios SET contraseña=?, reset_token=NULL, reset_expira=NULL WHERE id=?",
+db.query("UPDATE usuarios SET contraseña=?, reset_token = NULL, reset_expira=NULL WHERE id=?",
 [hashedPassword,result[0].id],
 async(err,result)=>{
 if (err){
 console.log(err)
 return res.status(400).json("Error al cambiar la contraseña")
 }
-res.send(result)
+res.status(200).json("Contraseña cambiada con exito")
 })}
 catch(err){
 console.log("Error al cambiar la contraseña")
@@ -173,8 +191,8 @@ res.send(result)
 })};
 
 
-exports.ObtenerUsuarios =(req,res)=>{
-db.query("SELECT id,nombre,apellido,correo,estado,rol,telefono,foto FROM usuarios",
+exports.ObtenerUsuarios = (req,res)=>{
+db.query("SELECT id,nombre,apellido,correo,rol,estado,telefono,foto FROM usuarios",
 (err,result)=>{
 if (err){
 console.log(err)
@@ -184,17 +202,28 @@ res.send(result)
 })};
 
 
+exports.ObtenerClientes =(req,res)=>{
+db.query("SELECT id,nombre,apellido,email,pdf,direccion,genero,telefono,documento FROM clientes",
+(err,result)=>{
+if (err){
+console.log(err)
+return res.status(400).json("Error al obtener los usuarios")
+}
+res.send(result)
+})}
+
+
 exports.ActualizarUsuarios =async(req,res)=>{
 const {nombre,apellido,correo,contraseña,estado}=req.body;
 const {id}=req.params;
 try{
 const hashedPassword = await bcrypt.hash(contraseña,10)
 db.query("UPDATE usuarios SET nombre=?,apellido=?,correo=?,contraseña=?,estado=? WHERE id=?",
-[nombre,apellido,correo,hashedPassword,estado],
+[nombre,apellido,correo,hashedPassword,estado,id],
 (err,result)=>{
 if (err){
 console.log(err)
-return res.status(400).json ("Usuario no actualizado")
+return res.status(400).json("Usuario no actualizado")
 }
 res.send(result)
 })}
@@ -216,75 +245,43 @@ res.send(result)
 })};
 
 
-
-exports.CambiarEstado = (req,res)=>{
-const {id}=req.params;
-const {estado}=req.body;
-db.query("UPDATE usuarios SET estado = IF (estado = 'activo' , 'inactivo', 'activo') WHERE id=?",
-[estado,id],
-(err,result)=>{
-if (err){
-console.log(err)
-return res.status(400).json("Error al cambiar el estado")
-}
-res.send(result)
-})};
-
-
 exports.SubirFoto =(req,res)=>{
 const {id}=req.params;
 const foto = req.file.filename;
 db.query("UPDATE usuarios SET foto =? WHERE id=?",
 [foto,id],
 (err,result)=>{
-if(err){
+if (err){
 console.log(err)
-return res.status(400).json("Error al actualizar la foto")
+return res.status(400).json("Error al subir la foto")
 }
 res.send(result)
 })};
 
 
-exports.SubirPDF =(req,res)=>{
+exports.CambiarEstado = (req,res)=>{
 const {id}=req.params;
-const pdf = req.file.filename;
-
-db.query(
-"UPDATE facturas SET pdf =? WHERE id=?",
-[pdf,id],
+const {estado}=req.body;
+db.query("UPDATE usuarios SET estado = IF (estado = 'activo','inactivo','activo')",
+[estado,id],
 (err,result)=>{
 if (err){
 console.log(err)
-return res.status(400).json("Error al subir el pdf")
-}
-
-res.send({
-mensaje : "PDF subido correctamente",
-pdf
-})
-
-})
-};
-
-exports.CrearClientes =(req,res)=>{
-const {nombre,apellido,documento,email,direccion,genero,telefono,tipo_documento}=req.body;
-db.query("INSERT INTO clientes (nombre,apellido,documento,email,direccion,genero,telefono,tipo_documento) VALUES(?,?,?,?,?,?,?,?)",
-[nombre,apellido,documento,email,direccion,genero,telefono,tipo_documento],
-(err,result)=>{
-if (err){
-console.log(err)
-return res.status(400).json("Cliente no registrado")
+return res.status(400).json("Error al actualizar el estado")
 }
 res.send(result)
 })};
 
 
-exports.ObtenerClientes =(req,res)=>{
-db.query("SELECT id,nombre,apellido,documento,email,direccion,genero,telefono,tipo_documento FROM clientes",
+exports.ActualizarPerfil =(req,res)=>{
+const {id}=req.params;
+const {correo,telefono}=req.body;
+db.query("UPDATE usuarios SET correo=?,telefono=? WHERE id=?",
+[correo,telefono,id],
 (err,result)=>{
 if (err){
 console.log(err)
-return res.status(400).json("Error al obtener a los clientes")
+return res.status(400).json("Error a actualizar los datos")
 }
 res.send(result)
 })};
@@ -297,26 +294,21 @@ db.query("DELETE FROM clientes WHERE id=?",
 (err,result)=>{
 if (err){
 console.log(err)
-return res.status(400).json("Error al eliminar el usuario")
+return res.status(400).json("Error al eliminar el cliente")
 }
 res.send(result)
 })};
 
 
-exports.ActualizarPerfil =(req,res)=>{
+exports.SubirPDF = (req,res)=>{
 const {id}=req.params;
-const {correo,telefono}=req.body;
-if (!correo || !telefono){
-return res.status(400).json("Todos los datos deben de estar llenos")
-}
-db.query("UPDATE usuarios SET correo=?, telefono=? WHERE id=?",
-[correo,telefono,id],
+const pdf = req.file.filename;
+db.query("UPDATE facturas SET pdf =? WHERE id=?",
+[pdf,id],
 (err,result)=>{
 if (err){
 console.log(err)
-return  res.status(400).json("Error al actualizar los datos")
+return res.status(400).json("Error al generar el pdf")
 }
 res.send(result)
-})};
-
-
+})}

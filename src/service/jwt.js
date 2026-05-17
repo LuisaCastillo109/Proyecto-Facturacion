@@ -2,17 +2,18 @@ const jwt = require ("jsonwebtoken");
 
 const VerificarToken = (req,res,next)=>{
 const AuthorizarToken = req.headers.authorization;
+
 if (!AuthorizarToken){
-return res.status(400).json("Error al verificar el token")
+return res.status(400).json("Falta la autorizacion para accerder aqui")
 }
 const TokenAdmin = AuthorizarToken.split(" ")[1];
 try{
-const Token = jwt.verify(TokenAdmin,process.env.JWT_SECRET);
+const Token = jwt.verify(TokenAdmin,process.env.JWT_SECRET)
 req.user = Token
 next();
 }
 catch(err){
-return res.status(400).json("Token invalido o expirado")
+console.log("Token expirado o invalido")
 }};
 
 
@@ -22,12 +23,11 @@ if (!req.user || !req.user.rol){
 return res.status(400).json("Rol desconocido")
 }
 if (!permisoRol.includes(req.user.rol)){
-return res.status(400).json("Usted no tiene autorizacion para accerder aqui")
+return res.status(400).json("Usted no tiene autorizacion para acceder aqui")
 }
 next();
-}}
+}};
 
 module.exports = {
-VerificarToken,
-TokenRol
+VerificarToken,TokenRol
 };
