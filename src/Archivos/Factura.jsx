@@ -10,7 +10,7 @@ const Factura = () => {
   const [clienteSeleccionado, setClienteSeleccionado] = useState(null);
   const [clientes, setClientes] = useState([]);
   const [productos, setProductos] = useState([]);
-  const [facturas, setFacturas] = useState([]); // <--- NUEVO: Estado para el historial
+  const [facturas, setFacturas] = useState([]);
   const [items, setItems] = useState([]);
   const [clienteId, setClienteId] = useState("");
   const [metodoPago, setMetodoPago] = useState("");
@@ -197,6 +197,29 @@ const enviarFactura = async (id) => {
       setItems([...items, { producto_id: producto.id, nombre: producto.nombre, precio: producto.precio, cantidad }]);
     }
   };
+
+  const eliminarProducto = (index) => {
+  const nuevosItems = items.filter((_, i) => i !== index);
+  setItems(nuevosItems);
+};
+
+const aumentarCantidad = (index) => {
+  const nuevosItems = [...items];
+  nuevosItems[index].cantidad += 1;
+  setItems(nuevosItems);
+};
+
+const disminuirCantidad = (index) => {
+  const nuevosItems = [...items];
+
+  if (nuevosItems[index].cantidad > 1) {
+    nuevosItems[index].cantidad -= 1;
+  } else {
+    nuevosItems.splice(index, 1);
+  }
+
+  setItems(nuevosItems);
+};
 
   return (
     <div className="landing">
@@ -393,12 +416,61 @@ const enviarFactura = async (id) => {
               </thead>
               <tbody>
                 {items.map((i, idx) => (
-                  <tr key={idx}>
-                    <td>{i.nombre}</td>
-                    <td>{i.cantidad}</td>
-                    <td className="text-right">${(i.precio * i.cantidad).toFixed(2)}</td>
-                  </tr>
-                ))}
+  <tr key={idx}>
+    <td>{i.nombre}</td>
+
+    <td>
+      <div style={{ display: "flex", gap: "5px", alignItems: "center" }}>
+        
+        <button
+          onClick={() => disminuirCantidad(idx)}
+          style={{
+            padding: "4px 10px",
+            border: "none",
+            borderRadius: "5px",
+            cursor: "pointer"
+          }}
+        >
+          -
+        </button>
+
+        <span>{i.cantidad}</span>
+
+        <button
+          onClick={() => aumentarCantidad(idx)}
+          style={{
+            padding: "4px 10px",
+            border: "none",
+            borderRadius: "5px",
+            cursor: "pointer"
+          }}
+        >
+          +
+        </button>
+      </div>
+    </td>
+
+    <td className="text-right">
+      ${(i.precio * i.cantidad).toFixed(2)}
+    </td>
+
+    <td>
+      <button
+        onClick={() => eliminarProducto(idx)}
+        style={{
+          background: "red",
+          color: "white",
+          border: "none",
+          padding: "5px 10px",
+          borderRadius: "5px",
+          cursor: "pointer"
+        }}
+      >
+        Eliminar
+      </button>
+    </td>
+  </tr>
+))}
               </tbody>
             </table>
           </div>
@@ -419,6 +491,13 @@ const enviarFactura = async (id) => {
         <div className="table-wrapper">
           <table className="modern-table">
             <thead>
+              <th>Acciones</th>
+              <tr>
+  <th>Producto</th>
+  <th>Cant.</th>
+  <th>Total</th>
+  <th>Acciones</th>
+</tr>
               <tr>
                 <th>ID</th>
                 <th>Cliente</th>

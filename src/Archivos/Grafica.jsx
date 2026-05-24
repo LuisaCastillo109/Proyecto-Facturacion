@@ -32,6 +32,7 @@ const DashboardGraficas = () => {
     facturas: 0,
     ventas: 0
   });
+  
  useEffect(() => {
 
   const user = JSON.parse(localStorage.getItem("usuario"));
@@ -88,11 +89,16 @@ const DashboardGraficas = () => {
 
   const modernPalette = ["#38bdf8", "#a855f7", "#fb923c", "#4ade80", "#94a3b8"];
 
-    useEffect(() => {
-    axios.get("http://localhost:3014/ObtenerDashboard")
-      .then(res => setDatos(res.data))
-      .catch(err => console.log(err));
-  }, []);
+  useEffect(() => {
+  const user = JSON.parse(localStorage.getItem("usuario"));
+
+  if (!user) return;
+
+  axios.get(`http://localhost:3014/ObtenerDashboard/${user.id}`)
+    .then(res => setDatos(res.data))
+    .catch(err => console.log(err));
+
+}, []);
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("usuario"));
