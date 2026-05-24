@@ -14,29 +14,13 @@ app.use (bodyParser.json());
 
 const imagenes = multer.diskStorage({
 destination : (req,file,cb)=>{
-cb (null, path.join (__dirname("..", "service", "uploads")))
+cb (null, path.join (__dirname,"..", "service", "uploads"))
 },
 filename : (req,file,cb)=>{
 cb (null, Date.now()+path.extname(file.originalname))
 }});
 const imagen = multer({storage : imagenes});
 
-
-const SubirPDF = multer.diskStorage({
-destination :(req,file,cb)=>{
-cb (null, path.join(__dirname, "..", "service", "pdf"))
-},
-filename : (req,file,cb)=>{
-cb (null, Date.now()+path.extname(file.originalname))
-}});
-
-const PDF = multer({storage : SubirPDF,
-fileFilter : (req,file,cb)=>{
-if (file.mimetype ==="application/pdf"){
-cb (null,true)
-}else{
-cb (new Error("Solo se permiten pdf"),false)
-}}});
 
 /**
  * @swagger
@@ -169,18 +153,7 @@ router.put("/CambiarEstado/:id",UsuarioControllers.CambiarEstado);
  *         description: Actualizar perfil del usuario
  */
 router.put("/ActualizarPerfil/:id",UsuarioControllers.ActualizarPerfil);
-/**
- * @swagger
- * /facturas/{id}/pdf:
- *   put:
- *     summary: Subir pdf
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Subir archivos pdf
- */
-router.put("/SubirPDF/:id",PDF.single("pdf"),UsuarioControllers.SubirPDF);
+
 /**
  * @swagger
  * /usuarios/{id}:
@@ -204,7 +177,7 @@ router.delete("/eliminar/:id",VerificarToken,TokenRol([1]),UsuarioControllers.El
  *       200:
  *         description: Eliminar Cliente por id
  */
-router.delete("/EliminarClientes",UsuarioControllers.EliminarClientes);
+router.delete("/EliminarClientes/:id",UsuarioControllers.EliminarClientes);
 /**
  * @swagger
  * /usuarios/{login}:

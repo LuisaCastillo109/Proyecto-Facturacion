@@ -20,9 +20,9 @@ const FacturasUsuarios = () => {
   const [tipoDocumento, setTipoDocumento] = useState("Todos");
   const [estadoFiltro, setEstadoFiltro] = useState("Todos");
 
-  const cargarDatos = () => {
-      axios.get("http://localhost:3014/ObtenerClientes").then(res => setClientes(res.data));
-      axios.get("http://localhost:3014/ObtenerFacturas").then(res => setFacturas(res.data)); // <--- CARGAR HISTORIAL
+  const cargarDatos = (usuarioId) => {
+      axios.get(`http://localhost:3014/ObtenerClientes/${usuarioId}`).then(res => setClientes(res.data));
+      axios.get(`http://localhost:3014/ObtenerFacturas/${usuarioId}`).then(res => setFacturas(res.data)); // <--- CARGAR HISTORIAL
     };
 
   useEffect(() => {
@@ -33,6 +33,7 @@ const FacturasUsuarios = () => {
 
   const obtenerDatos = async () => {
     try {
+      const user = JSON.parse(localStorage.getItem("usuario"));
       const res = await axios.get("http://localhost:3014/ObtenerClientesConFacturas");
       const agrupados = agruparUsuarios(res.data);
       setUsuarios(agrupados);
@@ -83,14 +84,27 @@ const FacturasUsuarios = () => {
   
 
   const agruparUsuarios = (data) => {
-    const usuariosMap = {};
-    data.forEach((item) => {
-      if (!usuariosMap[item.id_cliente]) {
-        usuariosMap[item.id_cliente] = {
-          ...item,
-          facturas: [],
-        };
-      }
+
+  const usuariosMap = {};
+
+  data.forEach((item) => {
+
+    if (!usuariosMap[item.id_cliente]) {
+
+      usuariosMap[item.id_cliente] = {
+        ...item,
+        facturas: [],
+      };
+
+    }
+
+    const existeFactura =
+      usuariosMap[item.id_cliente].facturas.some(
+        factura => factura.id === item.factura_id
+      );
+
+    if (!existeFactura) {
+
       usuariosMap[item.id_cliente].facturas.push({
         id: item.factura_id,
         total: item.total,
@@ -99,10 +113,13 @@ const FacturasUsuarios = () => {
         metodo_pago: item.metodo_pago,
         pdf: item.pdf
       });
-    });
-    return Object.values(usuariosMap);
-  };
 
+    }
+
+  });
+
+  return Object.values(usuariosMap);
+};
 
   const subirPDF = async (e, id) => {
   const file = e.target.files[0];

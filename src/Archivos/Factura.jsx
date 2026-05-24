@@ -30,25 +30,31 @@ const Factura = () => {
   email: ""
 });
 const [facturaAbierta, setFacturaAbierta] = useState(null);
-  // Cargar datos iniciales
-  useEffect(() => {
-    cargarDatos();
-    const user = JSON.parse(localStorage.getItem("usuario"));
-    if (user) setUsuario(user);
-  }, []);
 
-  const cargarDatos = () => {
-    axios.get("http://localhost:3014/ObtenerClientes").then(res => setClientes(res.data));
-    axios.get("http://localhost:3014/ObtenerProductos").then(res => setProductos(res.data));
-    axios.get("http://localhost:3014/ObtenerFacturas").then(res => setFacturas(res.data)); // <--- CARGAR HISTORIAL
-  };
+useEffect(() => {
+const user = JSON.parse(localStorage.getItem("usuario"));
+if (user) {
+setUsuario(user);
+cargarDatos(user.id);
+}}, []);
 
-  // FUNCIÓN PARA CAMBIAR ESTADO (La que "desbloquea" las ventas en el Dashboard)
+const cargarDatos = (usuarioId) => {
+console.log(usuarioId)
+axios.get(`http://localhost:3014/ObtenerClientes/${usuarioId}`)
+.then(res => setClientes(res.data));
+
+axios.get(`http://localhost:3014/ObtenerProductos/${usuarioId}`)
+.then(res => setProductos(res.data));
+
+axios.get(`http://localhost:3014/ObtenerFacturas/${usuarioId}`)
+.then(res => setFacturas(res.data));
+
+};
   const pagarFactura = async (id) => {
     try {
       await axios.put(`http://localhost:3014/PagarFactura/${id}`);
       alert("Factura marcada como PAGADA");
-      cargarDatos(); // Recargamos para ver el cambio
+      cargarDatos(usuario.id);
     } catch (error) {
       alert("Error al procesar pago");
     }
@@ -96,21 +102,23 @@ const [facturaAbierta, setFacturaAbierta] = useState(null);
       alert("Error al subir la foto");
     }};
 
-  const guardarFactura = async () => {
-  // 🔴 VALIDAR USUARIO
+ const guardarFactura = async () => {
+  // 1. Validaciones iniciales
   if (!usuario || !usuario.id) {
     alert("Usuario no disponible, inicia sesión nuevamente");
     return;
   }
 
-  // 🔴 VALIDAR DATOS
   if (!clienteId || items.length === 0 || !metodoPago) {
     alert("Complete los datos");
     return;
   }
 
   try {
-    // 🔥 DEBUG REAL
+    // 🚀 SOLUCIÓN: Buscamos al cliente AQUÍ, al principio de todo
+    const cliente = clientes.find(c => c.id === Number(clienteId));
+
+    // 🔥 Ahora que 'cliente' ya existe e inicializó, armamos el envío seguro
     console.log("ENVIANDO:", {
       usuario_id: usuario.id,
       id_cliente: clienteId,
@@ -118,21 +126,22 @@ const [facturaAbierta, setFacturaAbierta] = useState(null);
       subtotal,
       iva,
       total,
-      items
+      items,
     });
 
     const res = await axios.post("http://localhost:3014/crearFactura", {
       usuario_id: usuario.id,
       id_cliente: clienteId,
       metodo_pago: metodoPago,
+      nombre_cliente: `${cliente?.nombre || ""} ${cliente?.apellido || ""}`.trim(),
+      correo_cliente: cliente?.email || "", // 👈 Ahora sí lee de forma segura tu .email (:V)
       subtotal,
       iva,
       total,
       items
     });
 
-    const cliente = clientes.find(c => c.id === Number(clienteId));
-
+    // Armamos el objeto para pasar a la pantalla del comprobante bonito
     const facturaCompleta = {
       id: res.data.id,
       nombre: cliente?.nombre || "",
@@ -157,6 +166,20 @@ const [facturaAbierta, setFacturaAbierta] = useState(null);
   }
 };
 
+const enviarFactura = async (id) => {
+  try {
+
+    const response = await axios.post(
+      `http://localhost:3014/enviar-factura/${id}`
+    );
+
+    alert(response.data.mensaje);
+
+  } catch (error) {
+    console.log(error);
+    alert("Error al enviar factura");
+  }
+};
   const CerrarSesion =()=>{
   localStorage.removeItem("usuario");
   localStorage.removeItem("Token")
@@ -420,19 +443,21 @@ const [facturaAbierta, setFacturaAbierta] = useState(null);
             {f.estado}
           </span>
         </td>
-        <td>
-          {f.estado === 'PENDIENTE' && (
-            <button 
-              className="btn-pay"
-              onClick={(e) => {
-                e.stopPropagation(); // 🔥 evita que se abra al pagar
-                pagarFactura(f.id);
-              }}
-            >
-              Pagar
-            </button>
-          )}
-        </td>
+        <td style={{ display: "flex", gap: "10px" }}>
+
+  {f.estado === 'PENDIENTE' && (
+    <button 
+      className="btn-pay"
+      onClick={(e) => {
+        e.stopPropagation();
+        pagarFactura(f.id);
+      }}
+    >
+      Pagar
+    </button>
+  )}
+
+</td>
       </tr>
 
       {/* FILA DESPLEGABLE */}

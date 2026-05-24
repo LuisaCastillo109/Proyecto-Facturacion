@@ -27,8 +27,8 @@ try{
 const hashedPassword = await bcrypt.hash(contraseña,10)
 const Rol = rol || 2
 const estado = "activo"
-db.query("INSERT INTO usuarios (nombre,apellido,correo,contraseña,rol)VALUES(?,?,?,?,?)",
-[nombre,apellido,correo,hashedPassword,Rol],
+db.query("INSERT INTO usuarios (nombre,apellido,correo,contraseña,rol,estado)VALUES(?,?,?,?,?,?)",
+[nombre,apellido,correo,hashedPassword,Rol,estado],
 (err,result)=>{
 if (err){
 console.log(err)
@@ -42,12 +42,12 @@ console.log("Usuario no registrado")
 
 
 exports.CrearCliente =(req,res)=>{
-const {nombre,apellido,direccion,telefono,documento,email,tipo_documento,pdf}=req.body;
+const {nombre,apellido,direccion,telefono,documento,email,tipo_documento,pdf,usuario_id}=req.body;
 if (!nombre || !apellido || !direccion || !telefono ||!documento ||!email ||!tipo_documento){
 return res.status(400).json("Todos los datos deben de estar completo")
 }
-db.query("INSERT INTO clientes (nombre,apellido,direccion,telefono,documento,email,tipo_documento,pdf) VALUES (?,?,?,?,?,?,?,?)",
-[nombre,apellido,direccion,telefono,documento,email,tipo_documento,pdf],
+db.query("INSERT INTO clientes (nombre,apellido,direccion,telefono,documento,email,tipo_documento,pdf,usuario_id) VALUES (?,?,?,?,?,?,?,?,?)",
+[nombre,apellido,direccion,telefono,documento,email,tipo_documento,pdf,usuario_id],
 (err,result)=>{
 if (err){
 console.log(err)
@@ -203,7 +203,7 @@ res.send(result)
 
 
 exports.ObtenerClientes =(req,res)=>{
-db.query("SELECT id,nombre,apellido,email,pdf,direccion,genero,telefono,documento FROM clientes",
+db.query("SELECT id,nombre,apellido,email,pdf,direccion,genero,telefono,documento,usuario_id FROM clientes",
 (err,result)=>{
 if (err){
 console.log(err)
@@ -300,15 +300,3 @@ res.send(result)
 })};
 
 
-exports.SubirPDF = (req,res)=>{
-const {id}=req.params;
-const pdf = req.file.filename;
-db.query("UPDATE facturas SET pdf =? WHERE id=?",
-[pdf,id],
-(err,result)=>{
-if (err){
-console.log(err)
-return res.status(400).json("Error al generar el pdf")
-}
-res.send(result)
-})}

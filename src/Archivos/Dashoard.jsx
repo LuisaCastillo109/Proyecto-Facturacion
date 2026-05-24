@@ -17,18 +17,22 @@ const Dashboard = () => {
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    axios.get("http://localhost:3014/ObtenerDashboard")
-      .then(res => setDatos(res.data))
-      .catch(err => console.log(err));
-  }, []);
+ useEffect(() => {
 
-  useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("usuario"));
-    if (user) {
-      setUsuario(user);
-    }
-  }, []);
+const user = JSON.parse(localStorage.getItem("usuario"));
+
+if (user) {
+
+setUsuario(user);
+
+axios
+.get(`http://localhost:3014/ObtenerDashboard/${user.id}`)
+.then(res => setDatos(res.data))
+.catch(err => console.log(err));
+
+}
+
+}, []);
 
   const SubirFoto = async () => {
     if (!archivo) {

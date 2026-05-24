@@ -32,19 +32,25 @@ const DashboardGraficas = () => {
     facturas: 0,
     ventas: 0
   });
-  useEffect(() => {
-    axios.get("http://localhost:3014/VentasMensuales")
-      .then(res => setVentasMensuales(res.data))
-      .catch(err => console.error(err));
+ useEffect(() => {
 
-    axios.get("http://localhost:3014/VentasPorProducto")
-      .then(res => setVentasProductos(res.data))
-      .catch(err => console.error(err));
+  const user = JSON.parse(localStorage.getItem("usuario"));
 
-    axios.get("http://localhost:3014/Resumen")
-      .then(res => setDatosResumen(res.data))
-      .catch(err => console.error(err));
-  }, []);
+  if (!user) return;
+
+  axios.get(`http://localhost:3014/VentasMensuales/${user.id}`)
+    .then(res => setVentasMensuales(res.data))
+    .catch(err => console.error(err));
+
+  axios.get(`http://localhost:3014/VentasPorProducto/${user.id}`)
+    .then(res => setVentasProductos(res.data))
+    .catch(err => console.error(err));
+
+  axios.get(`http://localhost:3014/Resumen/${user.id}`)
+    .then(res => setDatosResumen(res.data))
+    .catch(err => console.error(err));
+
+}, []);
 
   const SubirFoto = async () => {
     if (!archivo) {

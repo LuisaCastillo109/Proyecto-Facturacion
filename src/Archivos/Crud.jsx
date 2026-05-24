@@ -25,7 +25,7 @@ const GestionClientesAdmin = () => {
 
   const API = "http://localhost:3014";
   const Token = localStorage.getItem("Token");
-
+  const usuario = JSON.parse(localStorage.getItem("usuario"));
   const api = axios.create({
     baseURL: API,
     headers: {
@@ -38,7 +38,7 @@ const GestionClientesAdmin = () => {
   const obtenerClientes = async () => {
     try {
       // Cambiado de /ObtenerUsuarios a /ObtenerClientes
-      const response = await api.get("/ObtenerClientes");
+      const response = await api.get(`/ObtenerClientes/${usuario.id}`);
       setClientes(response.data);
     } catch (err) {
       console.error("Error al obtener los clientes", err);
@@ -48,9 +48,11 @@ const GestionClientesAdmin = () => {
   const crearCliente = async (e) => {
     e.preventDefault();
     try {
-      await api.post("/CrearCliente", nuevoCliente);
+      await api.post("/CrearCliente",{
+      ...nuevoCliente,usuario_id: usuario.id
+      });
       alert("Cliente creado con éxito");
-      setNuevoCliente({ nombre: "", apellido: "", documento: "", direccion: "", email: "", genero:"", telefono :"" }); // Limpiar form
+      setNuevoCliente({ nombre: "", apellido: "", documento: "", direccion: "", email: "", genero:"", telefono :""}); // Limpiar form
       obtenerClientes(); // Recargar lista
     } catch (err) {
       alert("Error al crear el cliente");

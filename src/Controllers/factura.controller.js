@@ -1,5 +1,9 @@
 require("dotenv").config();
 const db = require("../Conexion/conexion");
+const transporter = require ("../service/configuracion")
+const path = require ("path")
+const fs =  require('fs');
+const PDFDocument = require('pdfkit'); 
 
 exports.CrearFactura = (req, res) => {
   const {
@@ -109,7 +113,6 @@ exports.CrearFactura = (req, res) => {
 };
 
 
-
 exports.ConsultarFactura=(req,res)=>{
 const {id}=req.params;
 db.query(`SELECT u.nombre,u.apellido,p.nombre AS nombre_producto,d.cantidad,f.subtotal,f.pdf,f.iva,f.total
@@ -126,11 +129,13 @@ res.send(result)
 
 
 exports.ObtenerFacturas =(req,res)=>{
+const {id}=req.params;
 db.query(`SELECT f.id,f.usuario_id,f.id_cliente,f.pdf,c.nombre,c.apellido,c.tipo_documento,f.subtotal,f.iva,f.total,f.metodo_pago,f.estado,f.fecha,
 p.nombre AS nombre_producto,
 d.cantidad FROM facturas f INNER JOIN clientes c ON f.id_cliente = c.id
 INNER JOIN detalle_factura d ON f.id = d.factura_id
-INNER JOIN productos p ON d.producto_id = p.id`,
+INNER JOIN productos p ON d.producto_id = p.id  WHERE f.usuario_id =?`,
+[id],
 (err,result)=>{
 if (err){
 console.log(err)
@@ -140,7 +145,9 @@ res.send(result)
 })};
 
 exports.ObtenerProductos =(req,res)=>{
-db.query("SELECT * FROM productos",
+const {id}=req.params;
+db.query("SELECT * FROM productos WHERE usuario_id=?",
+[id],
 (err,result)=>{
 if (err){
 console.log(err)
@@ -203,25 +210,24 @@ exports.EliminarFactura = (req, res) => {
    DATOS DEL DASHBOARD
 ========================= */
 exports.ObtenerDashboard = (req, res) => {
-  const sqlClientes = "SELECT COUNT(*) AS total FROM usuarios"; 
-  const sqlFacturas = "SELECT COUNT(*) AS total FROM facturas";
+  const {id}=req.params;
+  const sqlClientes = "SELECT COUNT(*) AS total FROM clientes WHERE usuario_id =?"; 
+  const sqlFacturas = "SELECT COUNT(*) AS total FROM facturas WHERE usuario_id =?";
   
-  // NUEVA CONSULTA: Sumamos el subtotal de cada línea (cantidad * precio) 
-  // Unimos detalle_factura con facturas para filtrar solo las 'PAGADA'
   const sqlVentas = `
     SELECT SUM(df.cantidad * df.precio_unitario) AS total 
     FROM detalle_factura df
     JOIN facturas f ON df.factura_id = f.id
-    WHERE f.estado = 'PAGADA'
+    WHERE f.estado = 'PAGADA' AND f.usuario_id = ?
   `;
 
-  db.query(sqlClientes, (err, resClientes) => {
+  db.query(sqlClientes, [id], (err, resClientes) => {
     if (err) return res.status(500).json(err);
 
-    db.query(sqlFacturas, (err, resFacturas) => {
+    db.query(sqlFacturas, [id], (err, resFacturas) => {
       if (err) return res.status(500).json(err);
 
-      db.query(sqlVentas, (err, resVentas) => {
+      db.query(sqlVentas,[id], (err, resVentas) => {
         if (err) return res.status(500).json(err);
 
         res.status(200).json({
@@ -236,12 +242,12 @@ exports.ObtenerDashboard = (req, res) => {
 };
 
 exports.CrearProducto = (req, res) => {
-  const { nombre, precio, stock,descripcion,estado }=req.body;
+  const { nombre,precio,stock,descripcion,estado,usuario_id}=req.body;
   const imagen = req.file ? req.file.filename : null;
 
   db.query(
-    "INSERT INTO productos (nombre, precio, stock, imagen, descripcion, estado) VALUES (?,?,?,?,?,?)",
-    [nombre, precio, stock, imagen,descripcion,estado],
+    "INSERT INTO productos (nombre, precio, stock, imagen, descripcion, estado, usuario_id) VALUES (?,?,?,?,?,?,?)",
+    [nombre, precio, stock, imagen,descripcion,estado,usuario_id],
     (err) => {
       if (err) {
         console.log(err);
@@ -294,6 +300,19 @@ return res.status(400).json("Error al subir la foto")
 res.send(result)
 })};
 
+exports.ObtenerClientes =(req,res)=>{
+const {id}=req.params;
+db.query(
+"SELECT * FROM clientes WHERE usuario_id=?",
+[id],
+(err,result)=>{
+if (err){
+console.log(err)
+return res.status(400).json("Error al obtener clientes")
+}
+res.send(result)
+})};
+
 exports.ObtenerClientesConFacturas = (req, res) => {
   const sql = `
     SELECT 
@@ -305,6 +324,7 @@ exports.ObtenerClientesConFacturas = (req, res) => {
       c.direccion,
       c.tipo_documento,
       c.telefono,
+      c.usuario_id,
       f.id AS factura_id,
       f.total,
       f.subtotal,
@@ -349,18 +369,19 @@ exports.ObtenerFacturaCompleta = (req, res) => {
    VENTAS MENSUALES (TORTA)
 ========================= */
 exports.VentasMensuales = (req, res) => {
+  const {id}=req.params;
   const sql = `
     SELECT 
       DATE_FORMAT(f.fecha, '%Y-%m') AS mes,
       SUM(df.cantidad * df.precio_unitario) AS total
     FROM facturas f
     JOIN detalle_factura df ON f.id = df.factura_id
-    WHERE f.estado = 'PAGADA'
+    WHERE f.estado = 'PAGADA' AND f.usuario_id =?
     GROUP BY mes
     ORDER BY mes ASC
   `;
 
-  db.query(sql, (err, result) => {
+  db.query(sql,[id],(err, result) => {
     if (err) {
       console.log(err);
       return res.status(500).json("Error al obtener ventas");
@@ -370,6 +391,7 @@ exports.VentasMensuales = (req, res) => {
 
 
 exports.VentasPorProducto = (req, res) => {
+  const {id}=req.params;
   const sql = `
     SELECT 
       p.nombre AS producto,
@@ -377,17 +399,71 @@ exports.VentasPorProducto = (req, res) => {
     FROM detalle_factura df
     JOIN productos p ON df.producto_id = p.id
     JOIN facturas f ON df.factura_id = f.id
-    WHERE f.estado = 'PAGADA'
+    WHERE f.estado = 'PAGADA' AND f.usuario_id =?
     GROUP BY p.nombre
     ORDER BY total DESC
     LIMIT 6
   `;
 
-  db.query(sql, (err, result) => {
+  db.query(sql,[id],(err, result) => {
     if (err) {
       console.log(err);
       return res.status(500).json("Error en ventas por producto");
     }
     res.json(result);
+  });
+};
+
+exports.SubirPDF = (req,res)=>{
+const {id}=req.params;
+const pdf = req.file.filename;
+db.query("UPDATE facturas SET pdf =? WHERE id=?",
+[pdf,id],
+(err,result)=>{
+if (err){
+console.log(err)
+return res.status(400).json("Error al generar el pdf")
+}
+res.send(result)
+})}
+
+exports.EnviarFacturaFisica = (req, res) => {
+const { id } = req.params;
+db.query(`SELECT f.id, c.email, c.nombre, c.apellido FROM facturas f 
+INNER JOIN clientes c ON f.id_cliente = c.id WHERE f.id = ?`,
+[id],
+async (err, result) => {
+if (err || result.length === 0) {
+return res.status(404).json("No se encontró la factura o el cliente");
+}
+const cliente = result[0];
+const nombreArchivo = `factura_${id}.pdf`;
+const rutaFisicaPDF = path.join(__dirname, "..", "service", "pdf", nombreArchivo);
+/* Validacion de que exista el archivo en la carpeta*/
+if (!fs.existsSync(rutaFisicaPDF)) {
+console.error(`El archivo ${nombreArchivo} no existe en la carpeta.`);
+return res.status(404).json(`El archivo físico ${nombreArchivo} no se encuentra en la carpeta PDF todavía.`);
+}
+try {
+      await transporter.sendMail({
+        from: '"Misamooo" <dkim44243@gmail.com>',
+        to: cliente.email,
+        subject: `Factura Electrónica No. ${id}`,
+        html: `<p>Hola ${cliente.nombre} ${cliente.apellido}, adjuntamos tu factura original. ¡Gracias por tu compra!</p>`,
+        attachments: [
+          {
+            filename: nombreArchivo,
+            path: rutaFisicaPDF,
+          },
+        ],
+      });
+
+      console.log(`Factura ${id} enviada correctamente por correo.`);
+      return res.status(200).json("Correo enviado con éxito");
+
+    } catch (correoErr) {
+      console.error("Error en Nodemailer:", correoErr);
+      return res.status(500).json("Error al despachar el correo electrónico");
+    }
   });
 };

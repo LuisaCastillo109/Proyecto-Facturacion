@@ -27,7 +27,8 @@ const Productos = () => {
   }, []);
 
   const obtenerProductos = async () => {
-    const res = await axios.get(`${API}/ObtenerProductos`);
+    const user = JSON.parse(localStorage.getItem("usuario"));
+    const res = await axios.get(`${API}/ObtenerProductos/${user.id}`);
     setProductos(res.data);
   };
 
@@ -53,6 +54,7 @@ const Productos = () => {
       CREAR PRODUCTO
   ========================= */
   const crearProducto = async () => {
+  const user = JSON.parse(localStorage.getItem("usuario"));
     try {
       const formData = new FormData();
       formData.append("nombre", nombre);
@@ -61,7 +63,7 @@ const Productos = () => {
       formData.append("estado", estado);
       formData.append("stock", stock);
       formData.append("imagen", imagen);
-
+      formData.append("usuario_id", user.id);
       await axios.post(`${API}/CrearProducto`, formData);
       alert("Producto creado con éxito");
       obtenerProductos();

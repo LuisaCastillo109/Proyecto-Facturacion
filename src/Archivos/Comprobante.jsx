@@ -1,15 +1,32 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
 import { QRCodeCanvas } from "qrcode.react";
+import axios from "axios"; // Lo necesitamos para avisarle al backend
 import "../css/comprobante.css";
 
 const Comprobante = () => {
   const { state } = useLocation();
   const { factura } = state || {};
   const vendedor = JSON.parse(localStorage.getItem("usuario"));
+
   if (!factura) return <h2>No hay datos</h2>;
 
   const formatear = (num) => new Intl.NumberFormat("es-CO").format(num);
+
+
+  const notificarYEnviarCorreo = async () => {
+    try {
+      const res = await axios.post(`http://localhost:3014/EnviarFacturaFisica/${factura.id}`, 
+      {
+      id_cliente: 
+      factura.id_cliente || factura.cliente_id 
+      });
+
+      alert("Factura enviada al correo del cliente con éxito!");
+    } catch (error) {
+      console.error(error);
+      alert("El archivo aún no está en la carpeta o el nombre no coincide (Debe ser factura_ID.pdf)");
+    }};
 
   return (
     <div className="comprobante-container">
@@ -97,9 +114,17 @@ const Comprobante = () => {
           </div>
         </div>
 
-        <button onClick={() => window.print()} className="btn-print no-print">
-          Imprimir Factura
-        </button>
+        {/* 🔘 TUS DOS BOTONES DE CONTROL EN PANTALLA */}
+        <div className="no-print" style={{ display: "flex", gap: "10px", marginTop: "20px" }}>
+          <button onClick={() => window.print()} className="btn-print">
+            1. Imprimir / Guardar PDF
+          </button>
+          
+          <button onClick={notificarYEnviarCorreo} className="btn-email" style={{ backgroundColor: "#28a745", color: "white" }}>
+            2. Enviar PDF por Correo
+          </button>
+        </div>
+
       </div>
     </div>
   );
